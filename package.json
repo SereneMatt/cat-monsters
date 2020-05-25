@@ -2,7 +2,7 @@
   "name": "cat-monsters",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://SereneMatt.github.io/meaw",
+  "homepage": "https://serenematt.github.io/cat-monsters",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
