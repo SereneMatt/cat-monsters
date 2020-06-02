@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { CardList } from './components/card-list/card-list.component';
 import { SearchBox } from './components/search-box/search-box.component';
+import Lifecycles from './components/lifecycles/lifecycles.component';
 
 class App extends Component {
   constructor() {
@@ -10,7 +11,9 @@ class App extends Component {
 
     this.state = {
       monsters: [],
-      searchField: ''
+      searchField: '',
+      showField: true,
+      text: ''
     }
   }
 
@@ -32,6 +35,25 @@ class App extends Component {
     return (
       <div className='App'>
         <h1> Meaw Cats </h1>
+        <button
+          onClick={() =>
+            this.setState(state => ({
+              showField: !this.state.showField
+            }))
+          }
+          Toggle
+        >
+        </button>
+        <button
+          onClick={() =>
+            this.setState(state => ({
+              text: state.text + '_maaauuu'
+            }))
+          }
+          Update text
+        >
+        </button>
+        {this.state.showField ? <Lifecycles text={this.state.text} /> : null}
         <SearchBox
           placeholder='search mewsters'
           handleChange={(event) => this.handleChange(event)}
