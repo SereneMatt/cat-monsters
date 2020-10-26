@@ -1,68 +1,74 @@
-import React, { Component } from 'react';
+import React from 'react';
+import create from 'zustand';
+import { mountStoreDevtool } from 'simple-zustand-devtools';
 
 import './App.css';
-import { CardList } from './components/card-list/card-list.component';
-import { SearchBox } from './components/search-box/search-box.component';
-import Lifecycles from './components/lifecycles/lifecycles.component';
 
-class App extends Component {
-  constructor() {
-    super();
+const POKEMON_URL = 'https://gist.githubusercontent.com/jherr/23ae3f96cf5ac341c98cd9aa164d2fe3/raw/f8d792f5b2cf97eaaf9f0c2119918f333e348823/pokemon.json';
 
-    this.state = {
-      monsters: [],
-      searchField: '',
-      showField: true,
-      text: ''
-    }
-  }
+const useStore = create((set) => ({
+  filter: '',
+  pokemon: [],
+  setFilter: (filter) => set((state) => ({
+    ...state,
+    filter
+  })),
+  setPokemon: (pokemon) => set((state) => ({
+    ...state,
+    pokemon
+  }))
+}));
 
-  componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then(response => response.json())
-      .then(users => this.setState({ monsters: users }));
-  }
+if (process.env.NODE_ENV === 'development') {
+  mountStoreDevtool('Store', useStore);
+}
 
-  handleChange = (event) => {
-    this.setState({ searchField: event.target.value });
-  }
+const FilterInput = () => {
+  const filter = useStore((state) => state.filter);
+  const setFilter = useStore((state) => state.setFilter);
 
-  render() {
-    const { monsters, searchField } = this.state;
-    const filteredMonsters = monsters.filter(monster => 
-      monster.name.toLowerCase().includes(searchField.toLowerCase())
-    )
-    return (
-      <div className='App'>
-        <h1> Meaw Cats </h1>
-        <button
-          onClick={() =>
-            this.setState(state => ({
-              showField: !this.state.showField
-            }))
-          }
-          Toggle
-        >
-        </button>
-        <button
-          onClick={() =>
-            this.setState(state => ({
-              text: state.text + '_maaauuu'
-            }))
-          }
-          Update text
-        >
-        </button>
-        {this.state.showField ? <Lifecycles text={this.state.text} /> : null}
-        <SearchBox
-          placeholder='search mewsters'
-          handleChange={(event) => this.handleChange(event)}
-        />
-        <CardList monsters={ filteredMonsters } />
-      </div>
-    );
-  }
+  return (
+    <input value={filter} onChange={(event) => setFilter(event.target.value)}/>
+  )
+}
+
+const PokemonTable = () => {
+  const pokemon = useStore((state) => state.pokemon);
+  const filter = useStore((state) => state.filter);
+
+  return (
+    <table width='100%'>
+      <tbody>
+        {pokemon
+        .filter(({ name: {english}}) => english.toLowerCase().includes(filter.toLowerCase()))
+        .map(({ id, name: { english }, type }) => (
+          <tr key={id}>
+            <td>{english}</td>
+            <td>{type.join(', ')}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
 };
 
+fetch(POKEMON_URL)
+  .then(response => response.json())
+  .then((pokemon) => useStore.setState((state) => ({
+    ...state,
+    pokemon
+  })));
+
+function App() {
+  return (
+    <div className='App'>
+      <div>
+        <FilterInput />
+      </div>
+      <h1>List of Pokemon</h1>
+      <PokemonTable />
+    </div>
+  )
+}
 
 export default App;
