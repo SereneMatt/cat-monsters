@@ -4,7 +4,7 @@ import { Card } from '../card/card.component';
 
 import './card-list.styles.css';
 
-const CardList = (props) => (
+export const CardList = (props) => (
   <div className='card-list'>
     {
       props.monsters.map((monster) => (
@@ -13,5 +13,3 @@ const CardList = (props) => (
     }
   </div>
 );
-
-export default CardList;
